@@ -1,31 +1,54 @@
-# Full Stack Open – Experiment Workspace
+# Full Stack Open – Parts 8–14 Submission
 
-This repository contains a minimal, premium‑styled static site that documents the required parts 8‑14 of the Full Stack Open course.
+A monorepo containing exercises from **Full Stack Open** parts 8–14 by the University of Helsinki.
 
-## Table of Contents
-| Part | Description |
-|------|-------------|
-| [Part 8 – GraphQL (Client)](part8.html) | Apollo Client example |
-| [Part 9 – GraphQL (Server)](part9.html) | Apollo Server example |
-| [Part 10 – Testing](part10.html) | Jest test example |
-| [Part 11 – TypeScript](part11.html) | TS config and component |
-| [Part 12 – Docker](part12.html) | Dockerfile & compose |
-| [Part 13 – CI/CD](part13.html) | GitHub Actions workflow |
-| [Part 14 – Deployment](part14.html) | GitHub Pages deployment |
+## Repository Structure
 
-## Build & Run
+| Folder | Part | Topic |
+|--------|------|-------|
+| `part8/` | Part 8 | GraphQL – Apollo Server + Apollo Client React app (Library App) |
+| `part9/` | Part 9 | TypeScript – typed Express backend + React frontend |
+| `part10/` | Part 10 | React Native – Expo mobile app |
+| `part11/` | Part 11 | CI/CD – GitHub Actions pipeline |
+| `part12/` | Part 12 | Containers – Docker + docker-compose |
+| `part13/` | Part 13 | Relational Databases – Express + PostgreSQL + Sequelize |
+
+## Running Each Part
+
+### Part 8 – GraphQL
 ```bash
-npm install          # install Vite
-npm run dev          # start dev server (http://localhost:5173)
-npm run build        # generate static site in ./dist
+# Backend
+cd part8/library-backend
+npm install
+npm start   # http://localhost:4000
+
+# Frontend
+cd part8/library-frontend
+npm install
+npm start   # http://localhost:3000
 ```
 
-## Link Check
+### Part 9 – TypeScript
 ```bash
-node scripts/check_links.js   # fails if any internal link is broken
+cd part9
+npm install
+npm run dev   # http://localhost:3001
 ```
 
-## Deployment (GitHub Pages)
-1. Push the repo to GitHub.
-2. In repository settings enable **GitHub Pages** source `gh‑pages` (or `main` / `./dist`).
-3. The site will be available at `https://<username>.github.io/full-stack-open-submission/`.
+### Part 12 – Docker
+```bash
+cd part12
+docker-compose up
+```
+
+### Part 13 – PostgreSQL
+```bash
+cd part13
+# Configure DATABASE_URL in .env
+npm install
+npm run migrate
+npm start
+```
+
+## Submission
+Submitted via [Full Stack Open submission system](https://studies.cs.helsinki.fi/stats/courses/fullstackopen).
