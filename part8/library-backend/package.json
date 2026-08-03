@@ -1,7 +1,7 @@
 {
   "name": "library-backend",
   "version": "1.0.0",
-  "description": "FSO Part 8 - GraphQL Library Backend",
+  "description": "FSO Part 8 - GraphQL Library Backend with Subscriptions",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,8 +9,14 @@
   },
   "dependencies": {
     "@apollo/server": "^4.9.5",
+    "@graphql-tools/schema": "^10.0.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
     "graphql": "^16.8.1",
+    "graphql-subscriptions": "^2.0.0",
+    "graphql-ws": "^5.14.2",
     "mongoose": "^8.0.3",
+    "ws": "^8.14.2",
     "dotenv": "^16.3.1",
     "jsonwebtoken": "^9.0.2",
     "bcrypt": "^5.1.1"

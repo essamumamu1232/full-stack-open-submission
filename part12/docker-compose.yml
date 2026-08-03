@@ -1,35 +1,36 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  # Exercise 12.13: backend service
+  server:
+    build:
+      context: ./todo-app/backend
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:password@db:5432/appdb
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - db
+      - redis
     restart: unless-stopped
 
-  db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: appdb
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
+  # Exercise 12.14: nginx reverse proxy
   nginx:
-    image: nginx:alpine
+    image: nginx:1.20-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - app
+      - server
+
+  # Exercise 12.9: Redis for statistics
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
 
 volumes:
-  pgdata:
+  redis_data:

@@ -1,6 +1,14 @@
 const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
+const { expressMiddleware } = require('@apollo/server/express4')
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/lib/use/ws')
+const { PubSub } = require('graphql-subscriptions')
 const { GraphQLError } = require('graphql')
+const express = require('express')
+const cors = require('cors')
+const http = require('http')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 require('dotenv').config()
@@ -11,6 +19,7 @@ const User = require('./models/User')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key'
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/library'
+const pubsub = new PubSub()
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
@@ -42,6 +51,7 @@ const typeDefs = `
     value: String!
   }
 
+  # Exercise 8.13: fragment support via allBooks genre filter
   type Query {
     bookCount: Int!
     authorCount: Int!
@@ -60,6 +70,11 @@ const typeDefs = `
     editAuthor(name: String!, setBornTo: Int!): Author
     createUser(username: String!, favouriteGenre: String!): User
     login(username: String!, password: String!): Token
+  }
+
+  # Exercise 8.23: subscriptions
+  type Subscription {
+    bookAdded: Book!
   }
 `
 
@@ -98,17 +113,16 @@ const resolvers = {
       }
       const book = new Book({ ...args, author: author._id })
       await book.save()
-      return book.populate('author')
+      const populated = await book.populate('author')
+      // Exercise 8.23: publish subscription
+      pubsub.publish('BOOK_ADDED', { bookAdded: populated })
+      return populated
     },
     editAuthor: async (root, args, context) => {
       if (!context.currentUser) {
         throw new GraphQLError('Not authenticated', { extensions: { code: 'UNAUTHENTICATED' } })
       }
-      return Author.findOneAndUpdate(
-        { name: args.name },
-        { born: args.setBornTo },
-        { new: true }
-      )
+      return Author.findOneAndUpdate({ name: args.name }, { born: args.setBornTo }, { new: true })
     },
     createUser: async (root, args) => {
       const user = new User({ username: args.username, favouriteGenre: args.favouriteGenre })
@@ -123,20 +137,52 @@ const resolvers = {
       return { value: jwt.sign(token, JWT_SECRET) }
     },
   },
+
+  // Exercise 8.23: subscription resolver
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED'),
+    },
+  },
 }
 
-const server = new ApolloServer({ typeDefs, resolvers })
+const start = async () => {
+  const app = express()
+  const httpServer = http.createServer(app)
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({ req }) => {
-    const auth = req?.headers?.authorization
-    if (auth && auth.startsWith('Bearer ')) {
-      const token = auth.substring(7)
-      const decoded = jwt.verify(token, JWT_SECRET)
-      const currentUser = await User.findById(decoded.id)
-      return { currentUser }
-    }
-    return {}
-  },
-}).then(({ url }) => console.log(`Server ready at ${url}`))
+  const schema = makeExecutableSchema({ typeDefs, resolvers })
+
+  const wsServer = new WebSocketServer({ server: httpServer, path: '/' })
+  const serverCleanup = useServer({ schema }, wsServer)
+
+  const server = new ApolloServer({
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return { async drainServer() { await serverCleanup.dispose() } }
+        },
+      },
+    ],
+  })
+
+  await server.start()
+
+  app.use('/', cors(), express.json(), expressMiddleware(server, {
+    context: async ({ req }) => {
+      const auth = req?.headers?.authorization
+      if (auth && auth.startsWith('Bearer ')) {
+        const decoded = jwt.verify(auth.substring(7), JWT_SECRET)
+        const currentUser = await User.findById(decoded.id)
+        return { currentUser }
+      }
+      return {}
+    },
+  }))
+
+  const PORT = 4000
+  httpServer.listen(PORT, () => console.log(`Server ready at http://localhost:${PORT}`))
+}
+
+start()
