@@ -21,9 +21,11 @@ export const calculateBmi = (height: number, weight: number): string => {
   return 'Obese'
 }
 
-try {
-  const { height, weight } = parseBmiArguments(process.argv)
-  console.log(calculateBmi(height, weight))
-} catch (e: unknown) {
-  if (e instanceof Error) console.log('Error:', e.message)
+if (require.main === module) {
+  try {
+    const { height, weight } = parseBmiArguments(process.argv)
+    console.log(calculateBmi(height, weight))
+  } catch (e: unknown) {
+    if (e instanceof Error) console.log('Error:', e.message)
+  }
 }

@@ -12,6 +12,7 @@ A monorepo containing exercises from **Full Stack Open** parts 8–14 by the Uni
 | `part11/` | Part 11 | CI/CD – GitHub Actions pipeline |
 | `part12/` | Part 12 | Containers – Docker + docker-compose |
 | `part13/` | Part 13 | Relational Databases – Express + PostgreSQL + Sequelize |
+| `part14/` | Part 14 | Next.js – Full-stack React framework app |
 
 ## Running Each Part
 
@@ -33,6 +34,7 @@ npm start   # http://localhost:3000
 cd part9
 npm install
 npm run dev   # http://localhost:3001
+npm test      # Runs Jest test suite
 ```
 
 ### Part 12 – Docker
@@ -48,6 +50,13 @@ cd part13
 npm install
 npm run migrate
 npm start
+```
+
+### Part 14 – Next.js
+```bash
+cd part14
+npm install
+npm run dev   # http://localhost:3000
 ```
 
 ## Submission

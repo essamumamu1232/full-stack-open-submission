@@ -31,9 +31,11 @@ const parseExerciseArguments = (args: string[]): { daily: number[]; target: numb
   return { target, daily }
 }
 
-try {
-  const { daily, target } = parseExerciseArguments(process.argv)
-  console.log(calculateExercises(daily, target))
-} catch (e: unknown) {
-  if (e instanceof Error) console.log('Error:', e.message)
+if (require.main === module) {
+  try {
+    const { daily, target } = parseExerciseArguments(process.argv)
+    console.log(calculateExercises(daily, target))
+  } catch (e: unknown) {
+    if (e instanceof Error) console.log('Error:', e.message)
+  }
 }
