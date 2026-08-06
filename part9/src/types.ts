@@ -1,4 +1,21 @@
-// Exercises 9.19-9.27: Patientor Frontend types
+// ─── Part 9 Exercises 9.8-9.13: Flight Diary types ───────────────────────────
+
+export type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy'
+export type Visibility = 'great' | 'good' | 'ok' | 'poor'
+
+export interface DiaryEntry {
+  id: number
+  date: string
+  weather: Weather
+  visibility: Visibility
+  comment: string
+}
+
+export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>
+export type NewDiaryEntry = Omit<DiaryEntry, 'id'>
+
+// ─── Part 9 Exercises 9.19-9.27: Patientor types ─────────────────────────────
+
 export interface Diagnosis {
   code: string
   name: string
@@ -40,16 +57,16 @@ export interface HospitalEntry extends BaseEntry {
   discharge: Discharge
 }
 
-export interface HealthCheckEntry extends BaseEntry {
-  type: 'HealthCheck'
-  healthCheckRating: HealthCheckRating
-}
-
 export enum HealthCheckRating {
   'Healthy' = 0,
   'LowRisk' = 1,
   'HighRisk' = 2,
   'CriticalRisk' = 3,
+}
+
+export interface HealthCheckEntry extends BaseEntry {
+  type: 'HealthCheck'
+  healthCheckRating: HealthCheckRating
 }
 
 export type Entry = HospitalEntry | OccupationalHealthcareEntry | HealthCheckEntry
