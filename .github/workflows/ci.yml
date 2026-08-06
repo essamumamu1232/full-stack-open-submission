@@ -16,10 +16,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: part9/package-lock.json
       - name: Install dependencies
-        run: cd part9 && npm ci
+        run: cd part9 && npm install
       - name: Run linter
         run: cd part9 && npm run lint
 
@@ -33,10 +31,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: part9/package-lock.json
       - name: Install dependencies
-        run: cd part9 && npm ci
+        run: cd part9 && npm install
       - name: Build TypeScript
         run: cd part9 && npm run build
       - name: Upload build artifact
@@ -56,11 +52,11 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: cd part9 && npm ci
+        run: cd part9 && npm install
       - name: Run tests
-        run: cd part9 && npm test --if-present
+        run: cd part9 && npm test
 
-  # Exercise 11.9: Versioning
+  # Exercise 11.9: Versioning – only on master push
   tag_release:
     name: 🏷️ Tag Release
     runs-on: ubuntu-latest
@@ -105,4 +101,6 @@ jobs:
     if: failure()
     steps:
       - name: Notify failure
-        run: echo "Pipeline failed on ${{ github.ref }} – commit ${{ github.sha }} by ${{ github.actor }}"
+        run: |
+          echo "Pipeline FAILED on branch ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }} by ${{ github.actor }}"
