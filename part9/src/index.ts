@@ -3,7 +3,7 @@ import diaryRouter from './routes/diaries'
 import { calculateBmi } from './bmiCalculator'
 import { calculateExercises } from './exerciseCalculator'
 
-const app = express()
+export const app = express()
 app.use(express.json())
 
 // Exercise 9.4-9.7: HTTP endpoints for calculators
@@ -37,7 +37,9 @@ app.post('/api/exercises', (req, res) => {
 
 app.use('/api/diaries', diaryRouter)
 
-const PORT = 3001
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+if (require.main === module) {
+  const PORT = 3001
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
+}
