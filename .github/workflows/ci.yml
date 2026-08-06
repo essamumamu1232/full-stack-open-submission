@@ -1,4 +1,4 @@
-name: CI/CD Pipeline – Full Stack Open Part 11
+name: CI/CD Pipeline – Full Stack Open
 
 on:
   push:
@@ -16,9 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies
+      - name: Install dependencies (part9)
         run: cd part9 && npm install
-      - name: Run linter
+      - name: Run linter (part9)
         run: cd part9 && npm run lint
 
   # Exercise 11.4: Build
@@ -31,30 +31,44 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies
+      - name: Install dependencies (part9)
         run: cd part9 && npm install
-      - name: Build TypeScript
+      - name: Build TypeScript (part9)
         run: cd part9 && npm run build
+      - name: Install dependencies (part14)
+        run: cd part14 && npm install
+      - name: Build Next.js (part14)
+        run: cd part14 && npm run build
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build
           path: part9/build
 
-  # Exercise 11.5: Test
+  # Exercise 11.5: Test ALL parts in repository
   test:
-    name: 🧪 Test
+    name: 🧪 Test (${{ matrix.part }})
     runs-on: ubuntu-latest
     needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        part:
+          - 'part8/library-backend'
+          - 'part8/library-frontend'
+          - 'part9'
+          - 'part10'
+          - 'part13'
+          - 'part14'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Install dependencies
-        run: cd part9 && npm install
-      - name: Run tests
-        run: cd part9 && npm test
+        run: cd ${{ matrix.part }} && npm install --legacy-peer-deps
+      - name: Run tests for ${{ matrix.part }}
+        run: cd ${{ matrix.part }} && npm test
 
   # Exercise 11.9: Versioning – only on master push
   tag_release:
